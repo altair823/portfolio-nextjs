@@ -1,0 +1,71 @@
+name: CD for NestJS Deployment
+
+on:
+  workflow_call:
+    secrets:
+      SSH_PRIVATE_KEY:
+        required: true
+      SERVER_USER:
+        required: true
+      SERVER_HOST:
+        required: true
+      SERVER_PORT:
+        required: true
+      SLACK_WEBHOOK_URL:
+          required: true
+    inputs:
+      APP_NAME:
+        required: true
+        type: string
+      APP_PATH:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    permissions:
+      contents: read
+      actions: write
+      packages: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            export APP_NAME=${{ inputs.APP_NAME }}
+            export APP_PATH=${{ inputs.APP_PATH }}
+            cd $APP_PATH
+            git pull
+            npm install
+            npm run build
+            mkdir -p build
+            cp -r public build/public
+            cp -r .next/standalone/* build
+            cp -r .next/static build/.next/static
+            if pm2 describe $APP_NAME > /dev/null; then
+              echo "Restarting $APP_NAME..."
+              pm2 restart $APP_NAME
+            else
+              echo "Starting $APP_NAME..."
+              pm2 start ecosystem.config.js --only $APP_NAME
+            fi
+            
+            
+          
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
