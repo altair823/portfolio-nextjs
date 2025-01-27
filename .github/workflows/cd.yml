@@ -12,7 +12,7 @@ on:
       SERVER_PORT:
         required: true
       SLACK_WEBHOOK_URL:
-          required: true
+        required: true
     inputs:
       APP_NAME:
         required: true
@@ -76,7 +76,6 @@ jobs:
             cd $APP_PATH
             mv .next/static .next/standalone/.next/.
             mv public .next/standalone/.
-            cd ../..
             if pm2 describe $APP_NAME > /dev/null; then
               echo "Restarting $APP_NAME..."
               pm2 restart $APP_NAME
@@ -84,7 +83,7 @@ jobs:
               echo "Starting $APP_NAME..."
               pm2 start
             fi
-            
+
       - name: Notify Slack
         if: always()
         uses: 8398a7/action-slack@v3
