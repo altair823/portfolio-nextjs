@@ -73,15 +73,16 @@ jobs:
           script: |
             export APP_NAME=${{ inputs.APP_NAME }}
             export APP_PATH=${{ inputs.APP_PATH }}
-            cd $APP_PATH/.next/standalone
-            mv static .next/.
+            cd $APP_PATH
+            mv .next/static .next/standalone/.next/.
+            mv public .next/standalone/.
             cd ../..
             if pm2 describe $APP_NAME > /dev/null; then
               echo "Restarting $APP_NAME..."
               pm2 restart $APP_NAME
             else
               echo "Starting $APP_NAME..."
-              pm2 start ecosystem.config.js --only $APP_NAME
+              pm2 start
             fi
             
       - name: Notify Slack
