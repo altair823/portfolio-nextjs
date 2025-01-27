@@ -48,7 +48,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: ".next/standalone/*,public,.next/static"
+          source: ".next/standalone,public,.next/static"
           target: ${{ inputs.APP_PATH }}
 
       - name: Deploy
