@@ -13,7 +13,7 @@ export default function Home() {
                     height={38}
                     priority
                 />
-                <p>version 0.0.3</p>
+                <p>김태현의 포트폴리오</p>
                 <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
                     <li className="mb-2">
                         Get started by editing{" "}
