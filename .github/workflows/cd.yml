@@ -33,8 +33,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build artifact
-        run: npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.11.0
+
+      - run: npm install --legacy-peer-deps
+      - run: npm run build
 
       - name: copy file via ssh password
         uses: appleboy/scp-action@v0.1.7
